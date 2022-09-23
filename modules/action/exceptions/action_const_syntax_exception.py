@@ -1,0 +1,2 @@
+class ActionConstSyntaxException(Exception):
+    pass

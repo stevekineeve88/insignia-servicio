@@ -1,4 +1,5 @@
 from sk88_service_locator.modules.service.managers.service_manager import ServiceManager
+from modules.action.config.config import ActionConfig
 from modules.util.config.config import UtilConfig
 
 
@@ -15,5 +16,6 @@ def get_service_manager() -> ServiceManager:
     if service_locator is None:
         service_locator = ServiceManager()
         service_locator.add(UtilConfig().get())
+        service_locator.add(ActionConfig().get())
 
     return service_locator

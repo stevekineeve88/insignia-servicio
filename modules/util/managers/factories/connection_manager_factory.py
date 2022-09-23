@@ -7,4 +7,4 @@ class ConnectionManagerFactory(FactoryInterface):
     """
 
     def invoke(self, service_manager) -> ConnectionManager:
-        return ConnectionManager("user_service_pool", 10)
+        return ConnectionManager("insignia_service_pool", 10)

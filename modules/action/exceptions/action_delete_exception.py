@@ -1,0 +1,2 @@
+class ActionDeleteException(Exception):
+    pass
