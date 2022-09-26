@@ -1,0 +1,2 @@
+class ActionFetchException(Exception):
+    pass

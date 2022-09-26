@@ -1,0 +1,2 @@
+class RoleGroupDeleteException(Exception):
+    pass

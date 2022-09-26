@@ -1,0 +1,2 @@
+class RoleDeleteException(Exception):
+    pass
