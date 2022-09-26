@@ -29,6 +29,25 @@ class RoleGroupData:
             "description": description
         })
 
+    def load_by_id(self, role_group_id: int) -> Result:
+        """ Load by ID
+        Args:
+            role_group_id (int):            Role group ID
+        Returns:
+            Result
+        """
+        return self.__connection_manager.select(f"""
+            SELECT
+                role_group.id,
+                bin_to_uuid(role_group.uuid) as uuid,
+                role_group.const,
+                role_group.description
+            FROM role_group
+            WHERE role_group.id = %(id)s
+        """, {
+            "id": role_group_id
+        })
+
     def delete(self, role_group_id: int) -> Result:
         """ Delete role group
         Args:
@@ -55,6 +74,7 @@ class RoleGroupData:
         return self.__connection_manager.select(f"""
             SELECT
                 role_group.id,
+                bin_to_uuid(role_group.uuid) as uuid,
                 role_group.const,
                 role_group.description
             FROM role_group

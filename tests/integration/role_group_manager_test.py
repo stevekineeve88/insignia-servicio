@@ -25,6 +25,7 @@ class RoleGroupManagerTest(IntegrationSetup):
         ).get_role_groups()[0]
 
         self.assertEqual(role_group.get_id(), fetched_role_group.get_id())
+        self.assertEqual(role_group.get_uuid(), fetched_role_group.get_uuid())
         self.assertEqual(role_group.get_const(), fetched_role_group.get_const())
         self.assertEqual(role_group.get_description(), fetched_role_group.get_description())
 

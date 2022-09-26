@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 from modules.role.data.role_group_data import RoleGroupData
 from modules.role.exceptions.role_group_const_syntax_exception import RoleGroupConstSyntaxException
 from modules.role.exceptions.role_group_create_exception import RoleGroupCreateException
@@ -31,7 +31,19 @@ class RoleGroupManager:
         result = self.__role_group_data.insert(const, description)
         if not result.get_status():
             raise RoleGroupCreateException(f"Could not create role group: {result.get_message()}")
-        return RoleGroup(result.get_last_insert_id(), const, description)
+        return self.get_by_id(result.get_last_insert_id())
+
+    def get_by_id(self, role_group_id: int) -> RoleGroup:
+        """ Get by ID
+        Args:
+            role_group_id (int):            Role group ID
+        Returns:
+            RoleGroup
+        """
+        result = self.__role_group_data.load_by_id(role_group_id)
+        if result.get_affected_rows() == 0:
+            raise RoleGroupFetchException(f"Could not fetch role group with ID {role_group_id}")
+        return RoleGroup(**result.get_data()[0])
 
     def delete(self, role_group_id: int):
         """ Delete role group
@@ -71,7 +83,7 @@ class RoleGroupManager:
         data = result.get_data()
         role_groups: List[RoleGroup] = []
         for datum in data:
-            role_groups.append(RoleGroup(datum["id"], datum["const"], datum["description"]))
+            role_groups.append(RoleGroup(**datum))
 
         result = self.__role_group_data.search_count(search)
         if not result.get_status():
