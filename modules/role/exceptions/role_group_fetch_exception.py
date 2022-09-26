@@ -1,0 +1,2 @@
+class RoleGroupFetchException(Exception):
+    pass

@@ -1,0 +1,2 @@
+class RoleGroupCreateException(Exception):
+    pass

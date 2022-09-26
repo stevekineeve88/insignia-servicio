@@ -1,0 +1,2 @@
+class RoleConstSyntaxException(Exception):
+    pass

@@ -3,6 +3,7 @@ from modules.action.data.action_data import ActionData
 from modules.action.exceptions.action_const_syntax_exception import ActionConstSyntaxException
 from modules.action.exceptions.action_create_exception import ActionCreateException
 from modules.action.exceptions.action_delete_exception import ActionDeleteException
+from modules.action.exceptions.action_fetch_exception import ActionFetchException
 from modules.action.objects.action import Action
 from modules.action.objects.action_search_result import ActionSearchResult
 
@@ -65,7 +66,7 @@ class ActionManager:
             offset=offset
         )
         if not result.get_status():
-            raise Exception(f"Could not search actions: {result.get_message()}")
+            raise ActionFetchException(f"Could not search actions: {result.get_message()}")
 
         data = result.get_data()
         actions: List[Action] = []
@@ -74,7 +75,7 @@ class ActionManager:
 
         result = self.__action_data.search_count(search)
         if not result.get_status():
-            raise Exception(f"Could not fetch action count: {result.get_message()}")
+            raise ActionFetchException(f"Could not fetch action count: {result.get_message()}")
         return ActionSearchResult(actions, result.get_data()[0]["count"])
 
     @classmethod

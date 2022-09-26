@@ -1,0 +1,2 @@
+class RoleFetchException(Exception):
+    pass

@@ -1,0 +1,2 @@
+class RoleGroupConstSyntaxException(Exception):
+    pass
