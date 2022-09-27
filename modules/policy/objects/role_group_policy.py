@@ -1,4 +1,5 @@
 from typing import List, Dict
+from sk88_http_response.modules.http.interfaces.http_dict import HTTPDict
 from modules.action.objects.action import Action
 from modules.policy.objects.action_policy import ActionPolicy
 from modules.policy.objects.role_policy import RolePolicy
@@ -6,7 +7,7 @@ from modules.role.objects.role import Role
 from modules.role.objects.role_group import RoleGroup
 
 
-class RoleGroupPolicy:
+class RoleGroupPolicy(HTTPDict):
     """ Object representing a role group policy with roles and actions
     """
     def __init__(self, data: List[Dict[str, any]]):
@@ -69,3 +70,43 @@ class RoleGroupPolicy:
             List[RolePolicy]
         """
         return list(self.__role_policies.values())
+
+    def get_http_dict(self) -> Dict[str, any]:
+        """ Get HTTP dict representation of a role group policy
+        Returns:
+            Dict[str, any]
+        """
+        role_policies = []
+        role_policy_objects = self.get_role_policies()
+        for role_policy in role_policy_objects:
+            role_policy_dict = {
+                "id": role_policy.get_id(),
+                "uuid": role_policy.get_uuid(),
+                "role": {
+                    "id": role_policy.get_role().get_id(),
+                    "const": role_policy.get_role().get_const(),
+                    "description": role_policy.get_role().get_description()
+                },
+                "action_policies": []
+            }
+            action_policies = role_policy.get_action_policies()
+            for action_policy in action_policies:
+                role_policy_dict["action_policies"].append({
+                    "id": action_policy.get_id(),
+                    "uuid": action_policy.get_uuid(),
+                    "action": {
+                        "id": action_policy.get_action().get_id(),
+                        "const": action_policy.get_action().get_const(),
+                        "description": action_policy.get_action().get_description()
+                    }
+                })
+            role_policies.append(role_policy_dict)
+        return {
+            "role_group": {
+                "id": self.get_role_group().get_id(),
+                "uuid": self.get_role_group().get_uuid(),
+                "const": self.get_role_group().get_const(),
+                "description": self.get_role_group().get_description()
+            },
+            "role_policies": role_policies
+        }
