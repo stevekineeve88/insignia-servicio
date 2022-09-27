@@ -1,5 +1,6 @@
 from sk88_service_locator.modules.service.managers.service_manager import ServiceManager
 from modules.action.config.config import ActionConfig
+from modules.policy.config.config import PolicyConfig
 from modules.role.config.config import RoleConfig
 from modules.util.config.config import UtilConfig
 
@@ -19,5 +20,6 @@ def get_service_manager() -> ServiceManager:
         service_locator.add(UtilConfig().get())
         service_locator.add(ActionConfig().get())
         service_locator.add(RoleConfig().get())
+        service_locator.add(PolicyConfig().get())
 
     return service_locator
