@@ -1,0 +1,2 @@
+class RoleGroupPolicyAddRoleException(Exception):
+    pass

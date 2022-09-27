@@ -1,0 +1,2 @@
+class RoleGroupPolicyFetchException(Exception):
+    pass
