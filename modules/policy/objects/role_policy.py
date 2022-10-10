@@ -1,9 +1,10 @@
-from typing import List
+from typing import List, Dict
+from sk88_http_response.modules.http.interfaces.http_dict import HTTPDict
 from modules.policy.objects.action_policy import ActionPolicy
 from modules.role.objects.role import Role
 
 
-class RolePolicy:
+class RolePolicy(HTTPDict):
     """ Object representing role policy attached to a role group policy
     """
     def __init__(self, role: Role, action_policies: List[ActionPolicy], **kwargs):
@@ -54,3 +55,15 @@ class RolePolicy:
             action_policy (ActionPolicy):       Action policy
         """
         self.__action_policies.append(action_policy)
+
+    def get_http_dict(self) -> Dict[str, any]:
+        """ Get HTTP dict representation of role policy
+        Returns:
+            Dict[str, any]
+        """
+        return {
+            "id": self.get_id(),
+            "uuid": self.get_uuid(),
+            "role": self.get_role().get_http_dict(),
+            "action_policies": [policy.get_http_dict() for policy in self.get_action_policies()]
+        }

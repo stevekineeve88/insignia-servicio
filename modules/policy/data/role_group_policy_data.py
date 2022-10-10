@@ -13,68 +13,116 @@ class RoleGroupPolicyData:
         """
         self.__connection_manager: ConnectionManager = kwargs.get("connection_manager")
 
-    def add_role(self, role_group_id: int, role_id: int) -> Result:
+    def add_role(self, role_group_uuid: str, role_uuid: str) -> Result:
         """ Add role to role group policy
         Args:
-            role_group_id (int):            Role group ID
-            role_id (int):                  Role ID
+            role_group_uuid (str):            Role group UUID
+            role_uuid (str):                  Role UUID
         Returns:
             Result
         """
         return self.__connection_manager.insert(f"""
             INSERT INTO role_group_role (role_group_id, role_id)
-            VALUES (%(role_group_id)s, %(role_id)s)
+            SELECT role_group.id, role.id FROM role_group, role
+            WHERE bin_to_uuid(role_group.uuid) = %(role_group_uuid)s
+            AND bin_to_uuid(role.uuid) = %(role_uuid)s
         """, {
-            "role_group_id": role_group_id,
-            "role_id": role_id
+            "role_group_uuid": role_group_uuid,
+            "role_uuid": role_uuid
         })
 
-    def delete_role(self, role_group_role_id: int) -> Result:
-        """ Delete role from role group policy
+    def load_role_policy_by_id(self, role_group_role_id: int) -> Result:
+        """ Load role policy by ID
         Args:
-            role_group_role_id (int):           Role group role ID
+            role_group_role_id (int):
         Returns:
             Result
         """
-        return self.__connection_manager.query(f"""
-            DELETE FROM role_group_role WHERE id = %(id)s
+        return self.__connection_manager.select(f"""
+            SELECT
+                role_group_role.id AS role_group_role_id,
+                bin_to_uuid(role_group_role.uuid) AS role_group_role_uuid,
+                role_group_role.role_id AS role_id,
+                bin_to_uuid(role.uuid) AS role_uuid,
+                role.const AS role_const,
+                role.description AS role_description
+            FROM role_group_role
+            INNER JOIN role ON role_group_role.role_id = role.id
+            WHERE role_group_role.id = %(id)s
         """, {
             "id": role_group_role_id
         })
 
-    def add_action(self, role_group_role_id: int, action_id: int) -> Result:
+    def delete_role(self, role_group_role_uuid: str) -> Result:
+        """ Delete role from role group policy
+        Args:
+            role_group_role_uuid (str):           Role group role UUID
+        Returns:
+            Result
+        """
+        return self.__connection_manager.query(f"""
+            DELETE FROM role_group_role WHERE bin_to_uuid(role_group_role.uuid) = %(uuid)s
+        """, {
+            "uuid": role_group_role_uuid
+        })
+
+    def add_action(self, role_group_role_uuid: str, action_uuid: str) -> Result:
         """ Add action to role in role group policy
         Args:
-            role_group_role_id (int):               Role group role ID
-            action_id (int):                        Action ID
+            role_group_role_uuid (str):               Role group role UUID
+            action_uuid (str):                        Action UUID
         Returns:
             Result
         """
         return self.__connection_manager.insert(f"""
             INSERT INTO role_group_role_action (role_group_role_id, action_id)
-            VALUES (%(role_group_role_id)s, %(action_id)s)
+            SELECT role_group_role.id, action.id FROM role_group_role, action
+            WHERE bin_to_uuid(role_group_role.uuid) = %(role_group_role_uuid)s
+            AND bin_to_uuid(action.uuid) = %(action_uuid)s
         """, {
-            "role_group_role_id": role_group_role_id,
-            "action_id": action_id
+            "role_group_role_uuid": role_group_role_uuid,
+            "action_uuid": action_uuid
         })
 
-    def delete_action(self, role_group_role_action_id: int) -> Result:
-        """ Delete action from role in role group policy
+    def load_action_policy_by_id(self, role_group_role_action_id: int) -> Result:
+        """ Load action policy by ID
         Args:
-            role_group_role_action_id (int):            Role group role action ID
+            role_group_role_action_id (int):
         Returns:
             Result
         """
-        return self.__connection_manager.query(f"""
-            DELETE FROM role_group_role_action WHERE id = %(id)s
+        return self.__connection_manager.select(f"""
+            SELECT
+                role_group_role_action.id AS role_group_role_action_id,
+                bin_to_uuid(role_group_role_action.uuid) AS role_group_role_action_uuid,
+                role_group_role_action.action_id AS action_id,
+                bin_to_uuid(action.uuid) AS action_uuid,
+                action.const AS action_const,
+                action.description AS action_description
+            FROM role_group_role_action
+            INNER JOIN action ON role_group_role_action.action_id = action.id
+            WHERE role_group_role_action.id = %(id)s
         """, {
             "id": role_group_role_action_id
         })
 
-    def load_by_role_group_id(self, role_group_id) -> Result:
+    def delete_action(self, role_group_role_action_uuid: str) -> Result:
+        """ Delete action from role in role group policy
+        Args:
+            role_group_role_action_uuid (str):            Role group role action UUID
+        Returns:
+            Result
+        """
+        return self.__connection_manager.query(f"""
+            DELETE FROM role_group_role_action WHERE bin_to_uuid(role_group_role_action.uuid) = %(uuid)s
+        """, {
+            "uuid": role_group_role_action_uuid
+        })
+
+    def load_by_role_group_uuid(self, role_group_uuid: str) -> Result:
         """ Load role group policy by role group ID
         Args:
-            role_group_id:      Role group ID
+            role_group_uuid (str):      Role group UUID
         Returns:
             Result
         """
@@ -87,11 +135,13 @@ class RoleGroupPolicyData:
                 role_group_role.id AS role_group_role_id,
                 bin_to_uuid(role_group_role.uuid) AS role_group_role_uuid,
                 role.id AS role_id,
+                bin_to_uuid(role.uuid) AS role_uuid,
                 role.const AS role_const,
                 role.description AS role_description,
                 role_group_role_action.id AS role_group_role_action_id,
                 bin_to_uuid(role_group_role_action.uuid) AS role_group_role_action_uuid,
                 action.id AS action_id,
+                bin_to_uuid(action.uuid) AS action_uuid,
                 action.const AS action_const,
                 action.description AS action_description
             FROM role_group
@@ -99,7 +149,7 @@ class RoleGroupPolicyData:
             INNER JOIN role ON role.id = role_group_role.role_id
             LEFT JOIN role_group_role_action ON role_group_role.id = role_group_role_action.role_group_role_id
             LEFT JOIN action ON action.id = role_group_role_action.action_id
-            WHERE role_group.id = %(id)s
+            WHERE bin_to_uuid(role_group.uuid) = %(uuid)s
         """, {
-            "id": role_group_id
+            "uuid": role_group_uuid
         })

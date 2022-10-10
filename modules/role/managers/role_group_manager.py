@@ -45,14 +45,14 @@ class RoleGroupManager:
             raise RoleGroupFetchException(f"Could not fetch role group with ID {role_group_id}")
         return RoleGroup(**result.get_data()[0])
 
-    def delete(self, role_group_id: int):
+    def delete(self, role_group_uuid: str):
         """ Delete role group
         Args:
-            role_group_id (int):        Role group ID
+            role_group_uuid (str):        Role group UUID
         """
-        result = self.__role_group_data.delete(role_group_id)
+        result = self.__role_group_data.delete(role_group_uuid)
         if result.get_affected_rows() == 0:
-            raise RoleGroupDeleteException(f"Could not delete role group with ID {role_group_id}")
+            raise RoleGroupDeleteException(f"Could not delete role group with UUID {role_group_uuid}")
 
     def search(self, **kwargs) -> RoleGroupSearchResult:
         """ Search role groups

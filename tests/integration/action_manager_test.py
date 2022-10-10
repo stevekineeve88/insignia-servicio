@@ -40,13 +40,13 @@ class ActionManagerTest(IntegrationSetup):
         const = "ENTITY:ACTION"
         description = "Some description"
         action = self.action_manager.create(const, description)
-        self.action_manager.delete(action.get_id())
+        self.action_manager.delete(action.get_uuid())
         result = self.action_manager.search(search=const)
         self.assertEqual(0, len(result.get_actions()))
 
     def test_delete_fails_on_invalid_id(self):
         with self.assertRaises(ActionDeleteException):
-            self.action_manager.delete(3)
+            self.action_manager.delete("sdfsdf")
             self.fail("Did not fail on invalid action ID on delete")
 
     def test_search_searches_actions(self):

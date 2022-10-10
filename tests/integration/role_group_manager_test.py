@@ -41,13 +41,13 @@ class RoleGroupManagerTest(IntegrationSetup):
         const = "ROLE_GROUP"
         description = "Some description"
         role_group = self.role_group_manager.create(const, description)
-        self.role_group_manager.delete(role_group.get_id())
+        self.role_group_manager.delete(role_group.get_uuid())
         result = self.role_group_manager.search(search=const)
         self.assertEqual(0, len(result.get_role_groups()))
 
     def test_delete_fails_on_invalid_id(self):
         with self.assertRaises(RoleGroupDeleteException):
-            self.role_group_manager.delete(3)
+            self.role_group_manager.delete("sdfsdf")
             self.fail("Did not fail on invalid role group ID on delete")
 
     def test_search_searches_role_groups(self):

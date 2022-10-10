@@ -1,16 +1,23 @@
-class Action:
+from typing import Dict
+from sk88_http_response.modules.http.interfaces.http_dict import HTTPDict
+
+
+class Action(HTTPDict):
     """ Object representing an action
     """
-    def __init__(self, action_id: int, const: str, description: str):
+    def __init__(self, **kwargs):
         """ Constructor for Action
         Args:
-            action_id (int):            Action ID
-            const (str):                Action constant
-            description (str):          Action description
+            **kwargs:   Action info
+                id (int)
+                uuid (str)
+                const (str)
+                description (str)
         """
-        self.__id: int = action_id
-        self.__const: str = const
-        self.__description: str = description
+        self.__id: int = kwargs.get("id")
+        self.__uuid: str = kwargs.get("uuid")
+        self.__const: str = kwargs.get("const")
+        self.__description: str = kwargs.get("description")
 
     def get_id(self) -> int:
         """ Get ID
@@ -18,6 +25,13 @@ class Action:
             int
         """
         return self.__id
+
+    def get_uuid(self) -> str:
+        """ Get UUID
+        Returns:
+            str
+        """
+        return self.__uuid
 
     def get_const(self) -> str:
         """ Get constant
@@ -32,3 +46,15 @@ class Action:
             str
         """
         return self.__description
+
+    def get_http_dict(self) -> Dict[str, any]:
+        """ Get HTTP dict representation of action
+        Returns:
+            Dict[str, any]
+        """
+        return {
+            "id": self.get_id(),
+            "uuid": self.get_uuid(),
+            "const": self.get_const(),
+            "description": self.get_description()
+        }
