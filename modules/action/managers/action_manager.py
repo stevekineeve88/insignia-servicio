@@ -31,16 +31,28 @@ class ActionManager:
         result = self.__action_data.insert(const, description)
         if not result.get_status():
             raise ActionCreateException(f"Could not create action: {result.get_message()}")
-        return Action(result.get_last_insert_id(), const, description)
+        return self.get_by_id(result.get_last_insert_id())
 
-    def delete(self, action_id: int):
+    def get_by_id(self, action_id: int) -> Action:
+        """ Get action by ID
+        Args:
+            action_id (int):
+        Returns:
+            Action
+        """
+        result = self.__action_data.load_by_id(action_id)
+        if result.get_affected_rows() == 0:
+            raise ActionFetchException(f"Could not fetch action with ID {action_id}")
+        return Action(**result.get_data()[0])
+
+    def delete(self, action_uuid: str):
         """ Delete action
         Args:
-            action_id (int):        Action ID
+            action_uuid (int):        Action ID
         """
-        result = self.__action_data.delete(action_id)
+        result = self.__action_data.delete(action_uuid)
         if result.get_affected_rows() == 0:
-            raise ActionDeleteException(f"Could not delete action with ID {action_id}")
+            raise ActionDeleteException(f"Could not delete action with UUID {action_uuid}")
 
     def search(self, **kwargs) -> ActionSearchResult:
         """ Search actions
@@ -71,7 +83,7 @@ class ActionManager:
         data = result.get_data()
         actions: List[Action] = []
         for datum in data:
-            actions.append(Action(datum["id"], datum["const"], datum["description"]))
+            actions.append(Action(**datum))
 
         result = self.__action_data.search_count(search)
         if not result.get_status():

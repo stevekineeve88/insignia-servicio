@@ -1,4 +1,9 @@
-class RoleGroup:
+from typing import Dict
+
+from sk88_http_response.modules.http.interfaces.http_dict import HTTPDict
+
+
+class RoleGroup(HTTPDict):
     """ Object representing role group
     """
     def __init__(self, **kwargs):
@@ -38,3 +43,15 @@ class RoleGroup:
             str
         """
         return self.__description
+
+    def get_http_dict(self) -> Dict[str, any]:
+        """ Get HTTP dict representation of role group
+        Returns:
+            Dict[str, any]
+        """
+        return {
+            "id": self.get_id(),
+            "uuid": self.get_uuid(),
+            "const": self.get_const(),
+            "description": self.get_description()
+        }

@@ -29,15 +29,34 @@ class ActionData:
             "description": description
         })
 
-    def delete(self, action_id: int) -> Result:
+    def delete(self, action_uuid: str) -> Result:
         """ Delete action
         Args:
-            action_id (int):            Action ID
+            action_uuid (str):            Action UUID
         Returns:
             Result
         """
         return self.__connection_manager.query(f"""
-            DELETE FROM action WHERE id = %(id)s
+            DELETE FROM action WHERE bin_to_uuid(uuid) = %(uuid)s
+        """, {
+            "uuid": action_uuid
+        })
+
+    def load_by_id(self, action_id: int) -> Result:
+        """ Load action by ID
+        Args:
+            action_id (int):
+        Returns:
+            Result
+        """
+        return self.__connection_manager.select(f"""
+            SELECT
+                action.id,
+                bin_to_uuid(action.uuid) as uuid,
+                action.const,
+                action.description
+            FROM action
+            WHERE action.id = %(id)s
         """, {
             "id": action_id
         })
@@ -55,6 +74,7 @@ class ActionData:
         return self.__connection_manager.select(f"""
             SELECT
                 action.id,
+                bin_to_uuid(action.uuid) as uuid,
                 action.const,
                 action.description
             FROM action

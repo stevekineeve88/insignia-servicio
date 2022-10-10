@@ -40,13 +40,13 @@ class RoleManagerTest(IntegrationSetup):
         const = "ROLE"
         description = "Some description"
         role = self.role_manager.create(const, description)
-        self.role_manager.delete(role.get_id())
+        self.role_manager.delete(role.get_uuid())
         result = self.role_manager.search(search=const)
         self.assertEqual(0, len(result.get_roles()))
 
     def test_delete_fails_on_invalid_id(self):
         with self.assertRaises(RoleDeleteException):
-            self.role_manager.delete(3)
+            self.role_manager.delete("sdfsdf")
             self.fail("Did not fail on invalid role ID on delete")
 
     def test_search_searches_roles(self):

@@ -43,7 +43,12 @@ class RoleGroupPolicy(HTTPDict):
             role_group_role_uuid = datum["role_group_role_uuid"]
             if role_group_role_uuid not in self.__role_policies:
                 self.__role_policies[role_group_role_uuid] = RolePolicy(
-                    Role(datum["role_id"], datum["role_const"], datum["role_description"]),
+                    Role(
+                        id=datum["role_id"],
+                        uuid=datum["role_uuid"],
+                        const=datum["role_const"],
+                        description=datum["role_description"]
+                    ),
                     [],
                     id=datum["role_group_role_id"],
                     uuid=role_group_role_uuid
@@ -52,7 +57,12 @@ class RoleGroupPolicy(HTTPDict):
             role_group_role_action_id = datum["role_group_role_action_id"]
             if role_group_role_action_id is not None:
                 role_policy.add_action_policy(ActionPolicy(
-                    Action(datum["action_id"], datum["action_const"], datum["action_description"]),
+                    Action(
+                        id=datum["action_id"],
+                        uuid=datum["action_uuid"],
+                        const=datum["action_const"],
+                        description=datum["action_description"]
+                    ),
                     id=role_group_role_action_id,
                     uuid=datum["role_group_role_action_uuid"]
                 ))
@@ -76,31 +86,6 @@ class RoleGroupPolicy(HTTPDict):
         Returns:
             Dict[str, any]
         """
-        role_policies = []
-        role_policy_objects = self.get_role_policies()
-        for role_policy in role_policy_objects:
-            role_policy_dict = {
-                "id": role_policy.get_id(),
-                "uuid": role_policy.get_uuid(),
-                "role": {
-                    "id": role_policy.get_role().get_id(),
-                    "const": role_policy.get_role().get_const(),
-                    "description": role_policy.get_role().get_description()
-                },
-                "action_policies": []
-            }
-            action_policies = role_policy.get_action_policies()
-            for action_policy in action_policies:
-                role_policy_dict["action_policies"].append({
-                    "id": action_policy.get_id(),
-                    "uuid": action_policy.get_uuid(),
-                    "action": {
-                        "id": action_policy.get_action().get_id(),
-                        "const": action_policy.get_action().get_const(),
-                        "description": action_policy.get_action().get_description()
-                    }
-                })
-            role_policies.append(role_policy_dict)
         return {
             "role_group": {
                 "id": self.get_role_group().get_id(),
@@ -108,5 +93,5 @@ class RoleGroupPolicy(HTTPDict):
                 "const": self.get_role_group().get_const(),
                 "description": self.get_role_group().get_description()
             },
-            "role_policies": role_policies
+            "role_policies": [policy.get_http_dict() for policy in self.get_role_policies()]
         }

@@ -31,16 +31,28 @@ class RoleManager:
         result = self.__role_data.insert(const, description)
         if not result.get_status():
             raise RoleCreateException(f"Could not create role: {result.get_message()}")
-        return Role(result.get_last_insert_id(), const, description)
+        return self.get_by_id(result.get_last_insert_id())
 
-    def delete(self, role_id: int):
+    def get_by_id(self, role_id: int) -> Role:
+        """ Get by ID
+        Args:
+            role_id (int):
+        Returns:
+            Role
+        """
+        result = self.__role_data.load_by_id(role_id)
+        if result.get_affected_rows() == 0:
+            raise RoleFetchException(f"Could not fetch role with ID {role_id}")
+        return Role(**result.get_data()[0])
+
+    def delete(self, role_uuid: str):
         """ Delete role
         Args:
-            role_id (int):        Role ID
+            role_uuid (str):        Role UUID
         """
-        result = self.__role_data.delete(role_id)
+        result = self.__role_data.delete(role_uuid)
         if result.get_affected_rows() == 0:
-            raise RoleDeleteException(f"Could not delete role with ID {role_id}")
+            raise RoleDeleteException(f"Could not delete role with UUID {role_uuid}")
 
     def search(self, **kwargs) -> RoleSearchResult:
         """ Search roles
@@ -71,7 +83,7 @@ class RoleManager:
         data = result.get_data()
         roles: List[Role] = []
         for datum in data:
-            roles.append(Role(datum["id"], datum["const"], datum["description"]))
+            roles.append(Role(**datum))
 
         result = self.__role_data.search_count(search)
         if not result.get_status():

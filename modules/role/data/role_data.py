@@ -29,17 +29,36 @@ class RoleData:
             "description": description
         })
 
-    def delete(self, role_id: int) -> Result:
+    def load_by_id(self, role_id: int) -> Result:
+        """ Load role by ID
+        Args:
+            role_id (int):
+        Returns:
+            Result
+        """
+        return self.__connection_manager.select(f"""
+            SELECT
+                role.id,
+                bin_to_uuid(role.uuid) as uuid,
+                role.const,
+                role.description
+            FROM role
+            WHERE role.id = %(id)s
+        """, {
+            "id": role_id
+        })
+
+    def delete(self, role_uuid: str) -> Result:
         """ Delete role
         Args:
-            role_id (int):            Role ID
+            role_uuid (str):            Role UUID
         Returns:
             Result
         """
         return self.__connection_manager.query(f"""
-            DELETE FROM role WHERE id = %(id)s
+            DELETE FROM role WHERE bin_to_uuid(uuid) = %(uuid)s
         """, {
-            "id": role_id
+            "uuid": role_uuid
         })
 
     def search(self, **kwargs) -> Result:
@@ -55,6 +74,7 @@ class RoleData:
         return self.__connection_manager.select(f"""
             SELECT
                 role.id,
+                bin_to_uuid(role.uuid) as uuid,
                 role.const,
                 role.description
             FROM role

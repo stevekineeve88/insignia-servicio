@@ -48,17 +48,17 @@ class RoleGroupData:
             "id": role_group_id
         })
 
-    def delete(self, role_group_id: int) -> Result:
+    def delete(self, role_group_uuid: str) -> Result:
         """ Delete role group
         Args:
-            role_group_id (int):            Role group ID
+            role_group_uuid (str):            Role group UUID
         Returns:
             Result
         """
         return self.__connection_manager.query(f"""
-            DELETE FROM role_group WHERE id = %(id)s
+            DELETE FROM role_group WHERE bin_to_uuid(role_group.uuid) = %(uuid)s
         """, {
-            "id": role_group_id
+            "uuid": role_group_uuid
         })
 
     def search(self, **kwargs) -> Result:
